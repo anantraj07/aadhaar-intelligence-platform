@@ -181,10 +181,6 @@ def load_all_data():
 def index():
     return render_template('index.html')
 
-@app.route('/government.html')
-def government():
-    return render_template('government.html')
-
 @app.route('/api/overview')
 def get_overview():
     """Get overview statistics"""
@@ -1774,7 +1770,7 @@ def get_methodology():
     
     return jsonify(methodology)
 
-@app.route('/index.html')
+@app.route('template/index.html')
 def intelligence():
     """Serve the Intelligence Platform page"""
     return render_template('index.html')
@@ -1784,4 +1780,5 @@ if __name__ == '__main__':
     load_all_data()
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
