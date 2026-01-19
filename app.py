@@ -1774,13 +1774,14 @@ def get_methodology():
     
     return jsonify(methodology)
 
-@app.route('/intelligence.html')
+@app.route('/index.html')
 def intelligence():
     """Serve the Intelligence Platform page"""
-    return render_template('intelligence.html')
+    return render_template('index.html')
 
 if __name__ == '__main__':
     import os
     load_all_data()
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
