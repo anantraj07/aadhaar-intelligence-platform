@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.env.local
+.flaskenv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Large data files (exclude from Git, use Git LFS or provide separately)
+# Uncomment these if you want to exclude large CSV files
+# api_data_aadhar_demographic/*.csv
+# api_data_aadhar_biometric/*.csv
+# api_data_aadhar_enrolment/*.csv
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store
