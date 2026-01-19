@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Dashboard - UIDAI Analytics</title>
+    <meta name="description"
+        content="Government-grade analytics dashboard for UIDAI data with drill-down analysis, spike detection, and actionable recommendations">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/government.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 2L4 8V14C4 22 10 28 16 30C22 28 28 22 28 14V8L16 2Z" fill="url(#gradient1)" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="4" y1="2" x2="28" y2="30">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="brand-text">Government Dashboard</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Public View</a>
+                <a href="/government.html" class="nav-link active">Government</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <main class="gov-dashboard">
+        <div class="container">
+            <!-- Methodology Note -->
+            <section class="methodology-note">
+                <div class="note-header">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                    </svg>
+                    <h3>Methodology & Data Science Note</h3>
+                    <button class="btn-collapse" id="toggleMethodology">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="note-content" id="methodologyContent">
+                    <div class="methodology-grid">
+                        <div class="method-card">
+                            <h4>🤖 Machine Learning Models</h4>
+                            <ul>
+                                <li><strong>K-Means Clustering:</strong> Groups districts into 6 clusters based on
+                                    demographic and enrollment patterns. Uses StandardScaler normalization and k-means++
+                                    initialization.</li>
+                                <li><strong>Validation:</strong> Silhouette Score (measures cluster quality, -1 to 1)
+                                    and Davies-Bouldin Index (lower is better)</li>
+                                <li><strong>Gradient Boosting:</strong> 30-day forecasting with 100 estimators, using
+                                    temporal features (day of year, month, day of week)</li>
+                                <li><strong>Random Forest:</strong> Feature importance analysis to identify key drivers
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="method-card">
+                            <h4>📊 Statistical Methods</h4>
+                            <ul>
+                                <li><strong>Spike Detection:</strong> Rolling Z-score analysis with 7-day window. Medium
+                                    severity: >2σ, High severity: >3σ</li>
+                                <li><strong>Trend Analysis:</strong> 7-day and 30-day moving averages, week-over-week
+                                    growth rates</li>
+                                <li><strong>Descriptive Stats:</strong> Mean, median, standard deviation, quartiles,
+                                    correlation analysis</li>
+                                <li><strong>Outlier Detection:</strong> Z-score method with configurable thresholds</li>
+                            </ul>
+                        </div>
+                        <div class="method-card">
+                            <h4>📁 Data Sources</h4>
+                            <ul>
+                                <li><strong>Demographic:</strong> 2.07M records - Age-wise demographic updates</li>
+                                <li><strong>Biometric:</strong> 1.86M records - Biometric update tracking</li>
+                                <li><strong>Enrollment:</strong> 1.01M records - New Aadhaar enrollments</li>
+                                <li><strong>Total:</strong> 4.94M records across 65 states/regions, 983 districts</li>
+                            </ul>
+                        </div>
+                        <div class="method-card">
+                            <h4>⚠️ Important Notes</h4>
+                            <ul>
+                                <li><strong>Reproducibility:</strong> All ML models use fixed random_state=42 for
+                                    consistent results</li>
+                                <li><strong>Limitations:</strong> Forecasts assume continuation of historical patterns
+                                </li>
+                                <li><strong>Data Quality:</strong> Automated validation checks for nulls, ranges, and
+                                    consistency</li>
+                                <li><strong>Updates:</strong> Analysis based on available data; results may change with
+                                    new data</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="methodology-actions">
+                        <a href="/api/methodology" target="_blank" class="btn-secondary">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                <path fill-rule="evenodd"
+                                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" />
+                            </svg>
+                            View Full Methodology (JSON)
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPI Section -->
+            <section class="kpi-section">
+                <h1 class="page-title">Government Command Center</h1>
+                <p class="page-subtitle">Real-time monitoring and actionable insights for UIDAI operations</p>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea, #764ba2)">
+                            <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                <path fill-rule="evenodd"
+                                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" />
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="totalRecordsKPI">0</div>
+                            <div class="kpi-label">Total Records</div>
+                            <div class="kpi-change positive" id="recordsChange">+0% this month</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c)">
+                            <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" />
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="coverageKPI">0%</div>
+                            <div class="kpi-label">Geographic Coverage</div>
+                            <div class="kpi-change" id="coverageDetails">0 states, 0 districts</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe)">
+                            <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                                <path
+                                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="activeAlertsKPI">0</div>
+                            <div class="kpi-label">Active Alerts</div>
+                            <div class="kpi-change warning" id="alertsBreakdown">0 high priority</div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">
+                            <svg width="24" height="24" fill="white" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="performanceKPI">0%</div>
+                            <div class="kpi-label">System Performance</div>
+                            <div class="kpi-change positive" id="performanceStatus">Excellent</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Drill-Down Explorer -->
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Hierarchical Drill-Down Explorer</h2>
+                        <p class="section-subtitle">Navigate from State → District → Pincode level analysis</p>
+                    </div>
+                    <button class="btn-download" id="downloadDrillDown">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" />
+                        </svg>
+                        Download CSV
+                    </button>
+                </div>
+
+                <div class="drill-down-container">
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="breadcrumb-item active" data-level="state">All States</span>
+                    </div>
+
+                    <div class="drill-down-content">
+                        <div class="drill-down-sidebar">
+                            <h3>Filters</h3>
+                            <div class="filter-group">
+                                <label>Sort By</label>
+                                <select id="sortBy" class="select-input">
+                                    <option value="total">Total Records</option>
+                                    <option value="name">Name (A-Z)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>Show Top</label>
+                                <select id="showTop" class="select-input">
+                                    <option value="10">Top 10</option>
+                                    <option value="20">Top 20</option>
+                                    <option value="50">Top 50</option>
+                                    <option value="all">All</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="drill-down-main">
+                            <div id="drillDownData" class="data-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Spike Detection & Alerts -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Spike Detection & Alerts</h2>
+                    <p class="section-subtitle">Automated detection of unusual enrollment patterns</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Spikes</h3>
+                            <span class="badge badge-danger" id="spikeCount">0 detected</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="spikesList" class="spikes-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="card glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Spike Timeline</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="spikeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comparative Analysis -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Comparative Analysis</h2>
+                    <p class="section-subtitle">Compare performance across states and districts</p>
+                </div>
+
+                <div class="comparison-tool">
+                    <div class="comparison-selector">
+                        <h3>Select Entities to Compare</h3>
+                        <div class="selector-grid">
+                            <div class="selector-group">
+                                <label>Entity 1</label>
+                                <select id="entity1" class="select-input">
+                                    <option value="">Select State...</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label>Entity 2</label>
+                                <select id="entity2" class="select-input">
+                                    <option value="">Select State...</option>
+                                </select>
+                            </div>
+                            <div class="selector-group">
+                                <label>Entity 3 (Optional)</label>
+                                <select id="entity3" class="select-input">
+                                    <option value="">Select State...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="compareBtn">Compare</button>
+                    </div>
+
+                    <div id="comparisonResults" class="comparison-results"></div>
+                </div>
+            </section>
+
+            <!-- Government Recommendations -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">AI-Powered Recommendations</h2>
+                    <p class="section-subtitle">Actionable insights for policy decisions</p>
+                </div>
+
+                <div class="recommendations-container" id="recommendationsContainer"></div>
+            </section>
+
+            <!-- Cluster Insights -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Regional Clustering & Insights</h2>
+                    <p class="section-subtitle">Identify similar regions for targeted interventions</p>
+                </div>
+
+                <div id="clusterInsights" class="cluster-grid"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/government.js') }}"></script>
+</body>
+
+</html>
